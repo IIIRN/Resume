@@ -78,6 +78,42 @@
             color: rgba(255, 255, 255, 0.6);
             text-align: center;
         }
+
+        /* Loading Overlay */
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(2px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-bottom-left-radius: 16px;
+            border-bottom-right-radius: 16px;
+            z-index: 10;
+            color: var(--brand);
+            font-weight: 500;
+        }
+
+        .spinner {
+            width: 30px;
+            height: 30px;
+            border: 3px solid #e0f2fe;
+            border-top-color: var(--brand);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 10px;
+        }
+
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
 
@@ -104,8 +140,14 @@
                 <h1>สายงานที่ต้องการสมัคร</h1>
                 <p>กรุณาเลือกสายงานที่คุณต้องการสมัคร เพื่อดำเนินการต่อ</p>
             </div>
-            <div class="card-b">
-                <div class="menu-list">
+            <div class="card-b" style="position: relative; min-height: 200px;">
+                <!-- Loading State -->
+                <div id="loadingOverlay" class="loading-overlay">
+                    <div class="spinner"></div>
+                    <div>กำลังเตรียมระบบ...</div>
+                </div>
+
+                <div class="menu-list" id="menuListItems" style="pointer-events: none; opacity: 0.5;">
                     <a href="./engineer/index.html" class="menu-item">
                         <div class="content">
                             <div class="icon">
@@ -195,13 +237,18 @@
                 // ใช้ LIFF ID จากคอนฟิก (ใช้ของ engineer เป็นตัวแทนเพราะเหมือนกัน)
                 await liff.init({ liffId: window.APP_CONFIG.LIFF.LIFF_ID });
 
+                if (!liff.isLoggedIn() && liff.isInClient()) {
+                    liff.login();
+                    return; // ให้เบราว์เซอร์ล้อกอินแล้วรีเฟรชกลับมาเอง
+                }
+
                 if (liff.isLoggedIn()) {
                     const profile = await liff.getProfile();
                     const userId = profile.userId;
                     const displayName = encodeURIComponent(profile.displayName);
 
                     // แสดงโปรไฟล์บนหน้าจอ
-                    document.getElementById('userProfileBox').style.display = 'block';
+                    document.getElementById('userProfileBox').style.display = 'flex';
                     if (profile.pictureUrl) {
                         document.getElementById('userProfileImg').src = profile.pictureUrl;
                     } else {
@@ -215,8 +262,19 @@
                         link.setAttribute('href', `${originalHref}?userId=${userId}&displayName=${displayName}`);
                     });
                 }
+
+                // เอา Loading Overlay ออกเมื่อโหลดเสร็จ
+                document.getElementById('loadingOverlay').style.display = 'none';
+                document.getElementById('menuListItems').style.pointerEvents = 'auto';
+                document.getElementById('menuListItems').style.opacity = '1';
+
             } catch (err) {
                 console.error("LIFF Init Error in Main Page:", err);
+
+                // กรณีเกิด Error ก็เปิดให้กดยื่นแบบ Guest ได้อยู่ดี
+                document.getElementById('loadingOverlay').style.display = 'none';
+                document.getElementById('menuListItems').style.pointerEvents = 'auto';
+                document.getElementById('menuListItems').style.opacity = '1';
             }
         }
         initMainLiff();
