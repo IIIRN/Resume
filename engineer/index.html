@@ -608,6 +608,25 @@
         </div>
     </div>
 
+    <!-- ================= Modal : ส่งสำเร็จ ================= -->
+    <div class="modal-backdrop" id="successModal">
+        <div class="modal" style="max-width: 400px; text-align: center;">
+            <div class="modal-h" style="justify-content: center; border-bottom: none; padding-bottom: 0;">
+                <div style="font-size: 50px; margin-bottom: 10px;">🎉</div>
+            </div>
+            <div class="modal-b">
+                <h2 style="color: #15803d; margin-bottom: 15px;">ส่งข้อมูลสำเร็จ!</h2>
+                <p style="margin-bottom: 25px; color: #475569;">
+                    ระบบได้รับข้อมูลใบสมัครของคุณเรียบร้อยแล้ว<br>กรุณารอการติดต่อกลับจากเจ้าหน้าที่ ขอบคุณครับ/ค่ะ</p>
+                <div class="actions" style="justify-content: center;">
+                    <button class="btn btn-primary" type="button" onclick="ปิดแอปLIFF()">
+                        ปิดหน้าต่างนี้
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- ================= Scripts ================= -->
     <script src="./js/Config.js"></script>
     <script src="./js/api.js"></script>
@@ -720,6 +739,25 @@
             document.getElementById('benefitModal').style.display = 'flex';
         }
         function ปิดModalสวัสดิการ() {
+            document.getElementById('benefitsModal').style.display = 'none';
+        }
+
+        // --- เพิ่มฟังก์ชันจัดการ Success Modal และปิดแอป ---
+        function เปิดModalสำเร็จ() {
+            document.getElementById('successModal').style.display = 'flex';
+        }
+
+        function ปิดแอปLIFF() {
+            if (liff.isInClient()) {
+                liff.closeWindow();
+            } else {
+                document.getElementById('successModal').style.display = 'none';
+                // ถ้าเปิดในเบราว์เซอร์ปกติ ก็ให้พาไปหน้าแรก
+                window.location.href = "../index.html";
+            }
+        }
+
+        function ยอมรับสวัสดิการ() {
             document.getElementById('benefitModal').style.display = 'none';
         }
 
@@ -823,20 +861,21 @@
                     await sendFlexMessage(data);
                 }
 
-                toast(t, 'ส่งใบสมัครสำเร็จ ✅');
                 form.reset();
                 // Reset benefits acceptance
                 document.getElementById('acceptedBenefits').value = 'false';
                 document.getElementById('btnBenefit').innerText = 'สวัสดิการและค่าตอบแทน';
                 document.getElementById('btnBenefit').style = '';
 
+                // ปิด Modal ยืนยัน แล้วเปิด Modal สำเร็จ
+                ปิดModalยืนยัน();
+                เปิดModalสำเร็จ();
+
             } catch (err) {
                 toast(t, 'ส่งไม่สำเร็จ: ' + err.message, true);
-            } finally {
-                // คืนค่าสถานะปุ่ม และปิด modal
+                ปิดModalยืนยัน();
                 btn.innerText = originalBtnText;
                 btn.disabled = false;
-                ปิดModalยืนยัน();
             }
         }
 
