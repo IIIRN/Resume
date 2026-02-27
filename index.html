@@ -83,24 +83,19 @@
 
 <body>
     <div class="container" style="max-width: 500px; padding-top: 40px;">
-        <div class="topbar" style="margin-bottom: 20px;">
+        <div class="topbar"
+            style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
             <div class="brand">
                 <div>
                     <div class="title">POWERTEC ENGINEERING</div>
                     <div class="sub">ระบบรับสมัครงานออนไลน์</div>
                 </div>
             </div>
-        </div>
 
-        <!-- กล่องแสดงโปรไฟล์ผู้ใช้ -->
-        <div id="userProfileBox"
-            style="display: none; align-items: center; background: white; padding: 12px 16px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid var(--line);">
-            <img id="userProfileImg" src="" alt="Profile Picture"
-                style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; margin-right: 12px; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-            <div style="display: flex; flex-direction: column;">
-                <span style="font-size: 13px; color: #64748b; margin-bottom: 2px;">ยินดีต้อนรับ</span>
-                <span id="userProfileName"
-                    style="font-size: 16px; font-weight: 600; color: var(--text);">ผู้ใช้งาน</span>
+            <!-- รูปโปรไฟล์ผู้ใช้ -->
+            <div id="userProfileBox" style="display: none;">
+                <img id="userProfileImg" src="" alt="Profile"
+                    style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid white; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
             </div>
         </div>
 
@@ -206,8 +201,7 @@
                     const displayName = encodeURIComponent(profile.displayName);
 
                     // แสดงโปรไฟล์บนหน้าจอ
-                    document.getElementById('userProfileBox').style.display = 'flex';
-                    document.getElementById('userProfileName').textContent = profile.displayName;
+                    document.getElementById('userProfileBox').style.display = 'block';
                     if (profile.pictureUrl) {
                         document.getElementById('userProfileImg').src = profile.pictureUrl;
                     } else {
